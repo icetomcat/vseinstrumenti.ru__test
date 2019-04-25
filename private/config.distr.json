@@ -1,0 +1,19 @@
+{
+	"database": {
+		"adapter": "\\Database\\Adapter",
+		"database_file": "",
+		"port": "",
+		"socket": "",
+		"type": "MySql",
+		
+		"host": "localhost",
+		"username": "username",
+		"password": "password",
+		"dbname": "dbname",
+		
+		"charset": "utf8",
+		"engine": "InnoDB",
+		"collation": "utf8_general_ci",
+		"prefix": "test_"
+	}
+}

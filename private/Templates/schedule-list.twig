@@ -1,0 +1,136 @@
+{% extends "html.twig"%}
+{% block body %}
+	<style>
+		.chart {
+			font-family: Arial, sans-serif;
+			font-size: 12px;
+		}
+
+		.axis path,.axis line {
+			fill: none;
+			stroke: #000;
+			shape-rendering: crispEdges;
+		}
+
+		.bar {
+			fill: #33b5e5;
+		}
+
+		.bar-failed {
+			fill: #CC0000;
+		}
+
+		.bar-running {
+			fill: #669900;
+		}
+
+		.bar-succeeded {
+			fill: #33b5e5;
+		}
+
+		.bar-killed {
+			fill: #ffbb33;
+		}
+
+		.svg-tooltip {
+			font-size: 30px;
+		}
+	</style>
+	<h1 class="text-center">Расписание</h1>
+	<div class="text-center">
+		<form class="form-inline" onsubmit="app.schedule.view($(this).serialize());
+				return false;">
+			<div class="form-group">
+				<label>From</label>
+				<input type="text" data-type="date" class="form-control" value="{{from}}" name="from" placeholder="From"/>
+			</div>
+			<div class="form-group">
+				<label>To</label>
+				<input type="text" data-type="date" class="form-control" value="{{to}}" name="to" placeholder="To"/>
+			</div>
+			<button type="submit" class="btn btn-info">Показать</button>
+			<button type="button" class="btn btn-success" data-toggle="modal" data-target="#addNewItem">Добавить</button>
+		</form>
+	</div>
+
+	<!-- Modal -->
+	<div class="modal fade" id="addNewItem" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<form action="{{this.app().request().getRootUri()}}" method="POST" onsubmit="app.schedule.create($(this).serialize()); return false;">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title" id="myModalLabel">Добавить</h4>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label>Регион</label>
+							<select id="addNewItem-input__region" class="form-control" name="items[0][region_id]">
+								{% for region in regions %}
+									<option value="{{region.id}}">{{region.name}}</option>
+								{% endfor %}
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Дата выезда</label>
+							<input id="addNewItem-input__start" type="text" data-type="date" class="form-control" value="{{'now'|date("d.m.Y")}}" name="items[0][start]" placeholder="Start"/>
+						</div>
+						<div class="form-group">
+							<label>Курьер</label>
+							<select id="addNewItem-input__courier" class="form-control" name="items[0][courier_id]">
+								{% for courier in couriers %}
+									<option value="{{courier.id}}">{{courier.full_name}}</option>
+								{% endfor %}
+							</select>
+						</div>
+						<div id="addNewItem-info">
+							<div class="clearfix">
+								<div class="pull-left">
+									<span class="h4">Дата прибытия в регион:</span>
+								</div>
+								<div class="pull-right">
+									<span class="h4" id="addNewItem-info__region-date"></span>
+								</div>
+							</div>
+							<div class="clearfix">
+								<div class="pull-left">
+									<span class="h4">Дата возвращения курьера:</span>
+								</div>
+								<div class="pull-right">
+									<span class="h4" id="addNewItem-info__back-date"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+						<button type="submit" class="btn btn-primary">Сохранить</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div id="gantt" style="width: 100%; height: 500px;"></div>
+
+	<script>
+		var taskNames = [{% for courier in couriers %}"{{courier.full_name}}",{% endfor %} ];
+				var regions = [{% for region in regions %}{name: "{{region.name}}", id:{{region.id}}, period: {{region.period}} },{% endfor %} ];
+				var tasks = [
+		{% for item in schedule %}
+					{
+					"startDate": new Date({{item.start|date('U')}} * 1000),
+							"endDate": new Date({{item.end|date('U')}} * 1000),
+							"courier": "{{item.courier}}",
+							"title": "{{item.title}}",
+							"status": "{{item.status}}",
+							"id": "{{item.id}}",
+							"region_id": "{{item.region_id}}",
+					},
+		{% endfor %}];
+	</script>
+{% endblock %}
+
+{% block title %}
+	Расписание курьеров
+{% endblock %}

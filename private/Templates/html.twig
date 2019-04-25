@@ -1,0 +1,41 @@
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4, user-scalable=yes">
+		<meta http-equiv="content-type" content="text/html; charset=urf-8">
+		<title>{% block title %}{% endblock %} - Test</title>
+		<meta name="description" content="">
+		<meta name="keywords" content="">
+		<link rel="stylesheet" href="{{this.app().request().getRootUri()}}/css/style.css" type="text/css">
+	</head>
+	<body>
+		<script>
+			var root_path = '{{this.app().request().getRootUri()}}';
+			Date.createFromMysql = function (mysql_string)
+			{
+				var t, result = null;
+
+				if (typeof mysql_string === 'string')
+				{
+					t = mysql_string.split(/[- :]/);
+
+					//when t[3], t[4] and t[5] are missing they defaults to zero
+					result = new Date(t[0], t[1] - 1, t[2], t[3] || 0, t[4] || 0, t[5] || 0);
+				}
+
+				return result;
+			}
+		</script>
+		
+		<div class="container">
+			{% block body %}
+			{% endblock %}
+		</div>
+
+		<script src="{{this.app().request().getRootUri()}}/js/vendor/d3.min.js" charset="utf-8"></script>
+		<script src="{{this.app().request().getRootUri()}}/js/gantt-chart-d3v21.js"></script>
+		<script src="{{this.app().request().getRootUri()}}/js/vendor/jquery.js"></script>
+		<script src="{{this.app().request().getRootUri()}}/js/vendor/bootstrap.min.js"></script>
+		<script src="{{this.app().request().getRootUri()}}/js/vendor/bootstrap-datepicker.min.js"></script>
+		<script src="{{this.app().request().getRootUri()}}/js/app.js"></script>
+	</body>
+</html>
